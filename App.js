@@ -39,7 +39,6 @@ class Simon extends Component {
   constructor(props) {
       super(props);
       this.state = {
-          timesToBlink: 5,
           durationMS: 1000,
           topLColour: topLeftColours[0],
           topRColour: topRightColours[0],
@@ -48,8 +47,7 @@ class Simon extends Component {
           startEnabled: true,
           simonCombo: [],
           userCombo: [],
-          flaccidLength: 5,   //Easy difficulty
-          hardLength: 10,     //Hard Difficulty
+          gameLength: 0,
           btnDisabled: false,
           buttonColour: 'blue',
       };
@@ -57,47 +55,88 @@ class Simon extends Component {
   
   // called when difficulty buttons are pressed, determines how many random numbers are put into the game array
   start = (diff) => {
+    let tempCombo = [];
     this.setState({
       btnDisabled: true,
     })
     if(diff == 1){
-      console.log('start easy');
-      for(let i = 0; i < this.state.flaccidLength; i++){
-        let simonNum = Math.floor(Math.random() * 500 % 4);
-        let simonCombo = [...simonCombo , simonNum];
-        console.log(simonCombo);
-        this.gameStart();
-      }
-    } else if (diff == 2){
-      console.log('start hard');
-      for(let i = 0; i < this.state.hardLength; i++){
 
+      this.setState({
+        gameLength: 5,
+      })
+
+      console.log('start easy');
+      for(let i = 0; i < this.state.gameLength; i++){
+        let simonNum = Math.floor(Math.random() * 500 % 4);
+        tempCombo = [...tempCombo , simonNum];
       }
+
+      this.setState({
+        simonCombo: tempCombo,
+      });
+
+      this.scheduler(this.state.gameLength);
+
+    } else if (diff == 2){
+
+      this.setState({
+        gameLength: 10,
+      })
+
+      console.log('start hard');
+      for(let i = 0; i < this.state.gameLength; i++){
+        let simonNum = Math.floor(Math.random() * 500 % 4);
+        tempCombo = [...tempCombo , simonNum];
+      }
+      this.setState({
+        simonCombo: tempCombo,
+      });
+      this.scheduler(this.state.gameLength);
     }
   }
 
   //handles the blinking of the buttons. The "call"
   gameStart = () => {
-    for(let i = 0; i <= this.state.simonCombo.length; i++){
-      for(let j = 0; j <= i; j++){
-        switch(this.state.simonCombo[i]){
-          case 0:
 
-          case 1:
+    }
 
-          case 2:
-
-          case 3:
-
-          default:
-        }
-      }
+  // makes the specified button "blink"
+  scheduler = (count) => {
+    if (count > 0) {
+        // blink and callback the next blink (recursion)
+        this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - count]);
+    } else {
+        this.setState({ btnDisabled: false });
     }
   }
 
-  // makes the specified button "blink"
-  blink = (button) => {
+  blink(callback, button) {
+      setTimeout(() => {
+        
+          // turn the light "on" (after a second)
+            switch(button){
+          case 0:
+            this.setState({topLColour: topLeftColours[1]})
+          case 1:
+            this.setState({topRColour: topRightColours[1]})
+          case 2:
+            this.setState({bottomLColour: bottomLeftColours[1]})
+          case 3:
+            this.setState({bottomRColour: bottomRightColours[1]})
+          default:
+          }
 
+          setTimeout(() => {
+              // turn the light off after one second
+              this.setState({ 
+                topLColour: topLeftColours[0],
+                topRColour: topRightColours[0],
+                bottomLColour: bottomLeftColours[0],
+                bottomRColour: bottomRightColours[0],
+              });
+              if (callback) callback(); // call the next scheduled event.
+          }, this.state.durationMS);
+      }, this.state.durationMS);
   }
 
   // called when the simon buttons are pressed. The "response"
@@ -108,6 +147,9 @@ class Simon extends Component {
   render(){
   return (
     <View style={styles.container}>
+
+      {/* tester text box to display array */}
+      <Text>{this.state.simonCombo}</Text>
 
       {/* top half of funny buttons */}
       <View style={styles.topHalf}>
@@ -166,6 +208,7 @@ class Simon extends Component {
           })}>
           <Text style={styles.btnText}>Start Hard</Text>
         </Pressable>
+
       </View>
         
     </View>
