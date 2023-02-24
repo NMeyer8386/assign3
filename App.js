@@ -39,7 +39,7 @@ class Simon extends Component {
   constructor(props) {
       super(props);
       this.state = {
-          durationMS: 1000,
+          durationMS: 500,
           topLColour: topLeftColours[0],
           topRColour: topRightColours[0],
           bottomLColour: bottomLeftColours[0],
@@ -75,8 +75,6 @@ class Simon extends Component {
         simonCombo: tempCombo,
       });
 
-      this.scheduler(this.state.gameLength);
-
     } else if (diff == 2){
 
       this.setState({
@@ -88,23 +86,19 @@ class Simon extends Component {
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
       }
+
       this.setState({
         simonCombo: tempCombo,
       });
-      this.scheduler(this.state.gameLength);
     }
+    this.scheduler(this.state.gameLength); 
   }
-
-  //handles the blinking of the buttons. The "call"
-  gameStart = () => {
-
-    }
 
   // makes the specified button "blink"
   scheduler = (count) => {
     if (count > 0) {
         // blink and callback the next blink (recursion)
-        this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - count]);
+        this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - (count + 1)]);
     } else {
         this.setState({ btnDisabled: false });
     }
@@ -117,13 +111,16 @@ class Simon extends Component {
             switch(button){
           case 0:
             this.setState({topLColour: topLeftColours[1]})
+            break;
           case 1:
             this.setState({topRColour: topRightColours[1]})
+            break;
           case 2:
             this.setState({bottomLColour: bottomLeftColours[1]})
+            break;
           case 3:
             this.setState({bottomRColour: bottomRightColours[1]})
-          default:
+            break;
           }
 
           setTimeout(() => {
