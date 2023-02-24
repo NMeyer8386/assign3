@@ -14,6 +14,8 @@ const topRightColours = ['#EC1919', '#ED6262'];
 const bottomLeftColours = ['#EBD924', '#F1E66F'];
 const bottomRightColours = ['#2B30F4', '#8083F6'];
 
+let tempArray = [];
+
 // Touchable opacities for the simon buttons. Uses a callback to register presses and which button was pressed
 class Light extends Component {
   constructor(props) {
@@ -56,16 +58,20 @@ class Simon extends Component {
   // called when difficulty buttons are pressed, determines how many random numbers are put into the game array
   start = (diff) => {
     let tempCombo = [];
-    let gameLength = 0;
+    let tempGameLength = 0;
     this.setState({
       btnDisabled: true,
     })
     if(diff == 1){
 
-      gameLength = 5;
+      this.setState({
+        gameLength: 5,
+      });
+
+      tempGameLength = 5;
 
       console.log('start easy');
-      for(let i = 0; i < gameLength; i++){
+      for(let i = 0; i < tempGameLength; i++){
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
       }
@@ -76,7 +82,7 @@ class Simon extends Component {
 
     } else if (diff == 2){
 
-      gameLength = 10;
+      tempGameLength = 10;
 
       console.log('start hard');
       for(let i = 0; i < gameLength; i++){
@@ -89,25 +95,31 @@ class Simon extends Component {
       });
     }
 
-          this.scheduler(gameLength);
-          setTimeout(() => {
-            console.log(this.state.simonCombo);
-          }, 2000);
+      setTimeout(() => { // any delay at all somehow is enough time to let an array be set?????
+        console.log(this.state.simonCombo);
+        this.scheduler(tempGameLength);
+      });
 
 
   }
 
   // makes the specified button "blink"
   scheduler = (count) => {
-    // TODO: For loop doing progressive simon-style incrementation while ensuring the user input is correct each time
+    // sets a temporary array so blinks can be incremented
+    for (let i = 0; i < count; i++){
+      tempArray[i] = this.state.simonCombo[i];
+    }
+
+    //handles the blink loop
     if (count >= 0) {
         // blink and callback the next blink (recursion)
-        this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - (count + 2)]);
+        this.blink(this.scheduler.bind(this, --count), tempArray[tempArray.length - (count + 1)]);
     } else {
         this.setState({ btnDisabled: false });
     }
   }
 
+  //makes the specifiec button blink
   blink(callback, button) {
       setTimeout(() => {
         
@@ -142,7 +154,8 @@ class Simon extends Component {
 
   // called when the simon buttons are pressed. The "response"
   btnPressed = (num) => {
-    console.log('pressed'+ num);
+    
+    
   }
 
   render(){
