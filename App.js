@@ -96,6 +96,7 @@ class Simon extends Component {
 
   // makes the specified button "blink"
   scheduler = (count) => {
+    // TODO: For loop doing progressive simon-style incrementation while ensuring the user input is correct each time
     if (count > 0) {
         // blink and callback the next blink (recursion)
         this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - (count + 1)]);
