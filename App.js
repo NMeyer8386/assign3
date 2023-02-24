@@ -39,7 +39,7 @@ class Simon extends Component {
   constructor(props) {
       super(props);
       this.state = {
-          durationMS: 500,
+          durationMS: 350,
           topLColour: topLeftColours[0],
           topRColour: topRightColours[0],
           bottomLColour: bottomLeftColours[0],
@@ -56,17 +56,16 @@ class Simon extends Component {
   // called when difficulty buttons are pressed, determines how many random numbers are put into the game array
   start = (diff) => {
     let tempCombo = [];
+    let gameLength = 0;
     this.setState({
       btnDisabled: true,
     })
     if(diff == 1){
 
-      this.setState({
-        gameLength: 5,
-      })
+      gameLength = 5;
 
       console.log('start easy');
-      for(let i = 0; i < this.state.gameLength; i++){
+      for(let i = 0; i < gameLength; i++){
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
       }
@@ -77,12 +76,10 @@ class Simon extends Component {
 
     } else if (diff == 2){
 
-      this.setState({
-        gameLength: 10,
-      })
+      gameLength = 10;
 
       console.log('start hard');
-      for(let i = 0; i < this.state.gameLength; i++){
+      for(let i = 0; i < gameLength; i++){
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
       }
@@ -91,15 +88,21 @@ class Simon extends Component {
         simonCombo: tempCombo,
       });
     }
-    this.scheduler(this.state.gameLength); 
+
+          this.scheduler(gameLength);
+          setTimeout(() => {
+            console.log(this.state.simonCombo);
+          }, 2000);
+
+
   }
 
   // makes the specified button "blink"
   scheduler = (count) => {
     // TODO: For loop doing progressive simon-style incrementation while ensuring the user input is correct each time
-    if (count > 0) {
+    if (count >= 0) {
         // blink and callback the next blink (recursion)
-        this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - (count + 1)]);
+        this.blink(this.scheduler.bind(this, --count), this.state.simonCombo[this.state.simonCombo.length - (count + 2)]);
     } else {
         this.setState({ btnDisabled: false });
     }
