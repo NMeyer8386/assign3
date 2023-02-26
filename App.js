@@ -49,7 +49,7 @@ class Simon extends Component {
           startEnabled: true,
           simonCombo: [],
           userCombo: [],
-          gameLength: 0,
+          currentRound: 1,
           btnDisabled: false,
           buttonColour: 'blue',
       };
@@ -63,10 +63,6 @@ class Simon extends Component {
       btnDisabled: true,
     })
     if(diff == 1){
-
-      this.setState({
-        gameLength: 5,
-      });
 
       tempGameLength = 5;
 
@@ -85,7 +81,7 @@ class Simon extends Component {
       tempGameLength = 10;
 
       console.log('start hard');
-      for(let i = 0; i < gameLength; i++){
+      for(let i = 0; i < tempGameLength; i++){
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
       }
@@ -97,7 +93,7 @@ class Simon extends Component {
 
       setTimeout(() => { // any delay at all somehow is enough time to let an array be set?????
         console.log(this.state.simonCombo);
-        this.scheduler(tempGameLength);
+        this.scheduler(this.state.currentRound);
       });
 
 
@@ -153,8 +149,35 @@ class Simon extends Component {
   }
 
   // called when the simon buttons are pressed. The "response"
+  // TODO: process userCombo input and compare to simonCombo with a for loop using userCombo.length, initiate next round with an
+  //incrementing int (while < simoncombo.length?)
   btnPressed = (num) => {
-    
+    console.log("pressed" + num);
+    let matching = true;
+    this.setState({
+      userCombo: [...this.state.userCombo, num],
+    })
+    setTimeout(() => {
+
+      // compares the two arrays to see if they're the same
+      if (this.state.userCombo.length < this.state.simonCombo.length){
+        for(let i = 0; i < this.state.userCombo.length; i++){
+          matching = matching && (this.state.userCombo[i] == this.state.simonCombo[i]);
+          console.log(this.state.userCombo[i] + " " + this.state.simonCombo[i]);
+        }
+
+      console.log(matching);
+      if(matching && (this.state.currentRound == this.state.userCombo.length)){
+        this.setState({
+          currentRound: this.state.currentRound + 1,
+          userCombo: [],
+        })
+        this.scheduler(this.state.currentRound);
+      }
+
+      }
+    });
+
     
   }
 
