@@ -1,3 +1,4 @@
+import { setStatusBarNetworkActivityIndicatorVisible } from 'expo-status-bar';
 import React, { Component } from 'react'
 import { Alert, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -51,18 +52,24 @@ class Simon extends Component {
           userCombo: [],
           currentRound: 1,
           btnDisabled: false,
+          isRunning: false,
           buttonColour: 'blue',
       };
   }
   
   // called when difficulty buttons are pressed, determines how many random numbers are put into the game array
+  // TODO: Figure out why the game breaks when playing hard after winning easy
   start = (diff) => {
     let tempCombo = [];
     let tempGameLength = 0;
+    tempArray = [];
     this.setState({
+      isRunning: true,
       btnDisabled: true,
       userCombo: [],
-    })
+      simonCombo: [],
+      currentRound: 1,
+    });
     if(diff == 1){
 
       tempGameLength = 5;
@@ -93,7 +100,6 @@ class Simon extends Component {
     }
 
       setTimeout(() => { // any delay at all somehow is enough time to let an array be set?????
-        console.log(this.state.simonCombo);
         this.scheduler(this.state.currentRound);
       });
 
@@ -159,14 +165,22 @@ class Simon extends Component {
     setTimeout(() => {
 
       // compares the two arrays to see if they're the same
-      if (this.state.userCombo.length <= this.state.simonCombo.length){
+      if (this.state.isRunning && (this.state.userCombo.length <= this.state.simonCombo.length)){
         for(let i = 0; i < this.state.userCombo.length; i++){
           matching = matching && (this.state.userCombo[i] == this.state.simonCombo[i]);
           console.log(this.state.userCombo[i] + " " + this.state.simonCombo[i]);
         }
+      }
+      console.log("Running " + this.state.isRunning);
+      if(matching && (this.state.userCombo.length == this.state.simonCombo.length)){
+        Alert.alert("You win!");
+        this.setState({
+          btnDisabled: false,
+          isRunning: false,
+        })
+      }
 
-      console.log(matching);
-      if(matching && (this.state.currentRound == this.state.userCombo.length)){
+      if(matching && (this.state.currentRound == this.state.userCombo.length) && this.state.isRunning){
         this.setState({
           currentRound: this.state.currentRound + 1,
           userCombo: [],
@@ -174,17 +188,11 @@ class Simon extends Component {
         this.scheduler(this.state.currentRound);
       }
 
-      if(matching && (this.state.userCombo.length == this.state.simonCombo.length))
-        Alert.alert("You win!");
-        this.setState({
-          btnDisabled: false,
-        })
-      }
-
       if(!matching){
         Alert.alert("You lose!");
         this.setState({
           btnDisabled: false,
+          isRunning: false,
         })
       }
     });
