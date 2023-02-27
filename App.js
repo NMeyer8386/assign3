@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Button, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 // CSS styling variables so I can control multiple elements at once
 const bWidth = 5;
@@ -61,6 +61,7 @@ class Simon extends Component {
     let tempGameLength = 0;
     this.setState({
       btnDisabled: true,
+      userCombo: [],
     })
     if(diff == 1){
 
@@ -110,8 +111,6 @@ class Simon extends Component {
     if (count >= 0) {
         // blink and callback the next blink (recursion)
         this.blink(this.scheduler.bind(this, --count), tempArray[tempArray.length - (count + 1)]);
-    } else {
-        this.setState({ btnDisabled: false });
     }
   }
 
@@ -160,7 +159,7 @@ class Simon extends Component {
     setTimeout(() => {
 
       // compares the two arrays to see if they're the same
-      if (this.state.userCombo.length < this.state.simonCombo.length){
+      if (this.state.userCombo.length <= this.state.simonCombo.length){
         for(let i = 0; i < this.state.userCombo.length; i++){
           matching = matching && (this.state.userCombo[i] == this.state.simonCombo[i]);
           console.log(this.state.userCombo[i] + " " + this.state.simonCombo[i]);
@@ -175,6 +174,18 @@ class Simon extends Component {
         this.scheduler(this.state.currentRound);
       }
 
+      if(matching && (this.state.userCombo.length == this.state.simonCombo.length))
+        Alert.alert("You win!");
+        this.setState({
+          btnDisabled: false,
+        })
+      }
+
+      if(!matching){
+        Alert.alert("You lose!");
+        this.setState({
+          btnDisabled: false,
+        })
       }
     });
 
@@ -205,6 +216,8 @@ class Simon extends Component {
       They also cause the simon buttons to light up for testing purposes
       */}
       <View style={styles.rowContainer}>
+
+        
         <Pressable 
         style={[styles.startButton, {backgroundColor: this.state.btnDisabled?'grey':'blue'}]}
         disabled={this.state.btnDisabled}
