@@ -14,6 +14,7 @@ const topRightColours = ['#EC1919', '#ED6262'];
 const bottomLeftColours = ['#EBD924', '#F1E66F'];
 const bottomRightColours = ['#2B30F4', '#8083F6'];
 
+// needs to be called globally because state variables SUCK
 let tempArray = [];
 
 // Touchable opacities for the simon buttons. Uses a callback to register presses and which button was pressed
@@ -27,7 +28,9 @@ class Light extends Component {
 
   render() {
       return (
+        // responsible for the rendering of the button: callback for button press
           <TouchableOpacity
+              disabled={this.props.btnDisabled}
               style={[this.props.style, {backgroundColor: this.props.color}]}
               num={this.props.num}
               onPress={() => {this.state.onPress(this.props.num)}}
@@ -50,14 +53,17 @@ class Simon extends Component {
           simonCombo: [],
           userCombo: [],
           currentRound: 1,
-          btnDisabled: false,
+          btnDisabled: true,
           isRunning: false,
           buttonColour: 'blue',
       };
   }
   
   // called when difficulty buttons are pressed, determines how many random numbers are put into the game array
-  // TODO: Figure out why the game breaks when playing hard after winning easy
+  /*  
+  TODO: Figure out why the game breaks when playing hard after winning easy
+  FIX: tempArray was never being cleared when start buttons were pressed
+  */
   start = (diff) => {
     let tempCombo = [];
     let tempGameLength = 0;
@@ -69,6 +75,8 @@ class Simon extends Component {
       simonCombo: [],
       currentRound: 1,
     });
+
+    // difficulty 1 is a game length of 5
     if(diff == 1){
 
       tempGameLength = 5;
@@ -81,8 +89,10 @@ class Simon extends Component {
 
       this.setState({
         simonCombo: tempCombo,
+        durationMS: 250,
       });
 
+    // difficulty 2 is a game length of 10
     } else if (diff == 2){
 
       tempGameLength = 10;
@@ -95,18 +105,23 @@ class Simon extends Component {
 
       this.setState({
         simonCombo: tempCombo,
+        durationMS: 200
       });
     }
-
-      setTimeout(() => { // any delay at all somehow is enough time to let an array be set?????
+    // any delay at all somehow is enough time to let an array be set?????
+    // set a longer delay because of how the buttons flash 
+      setTimeout(() => { 
         this.scheduler(this.state.currentRound);
       }, 100);
 
 
   }
 
-  // makes the specified button "blink"
+  // makes the specified button "blink" (stolen from Stephen)
   scheduler = (count) => {
+    this.setState({
+      btnDisabled: true,
+    })
     // sets a temporary array so blinks can be incremented
     for (let i = 0; i < count; i++){
       tempArray[i] = this.state.simonCombo[i];
@@ -116,10 +131,14 @@ class Simon extends Component {
     if (count >= 0) {
         // blink and callback the next blink (recursion)
         this.blink(this.scheduler.bind(this, --count), tempArray[tempArray.length - (count + 1)]);
+    } else if (count <= 2){
+      this.setState({
+        btnDisabled: false,
+      })
     }
   }
 
-  //makes the specifiec button blink
+  // makes the specifiec button blink
   blink(callback, button) {
       setTimeout(() => {
         
@@ -153,10 +172,11 @@ class Simon extends Component {
   }
 
   // called when the simon buttons are pressed. The "response"
-  // TODO: process userCombo input and compare to simonCombo with a for loop using userCombo.length, initiate next round with an
-  //incrementing int (while < simoncombo.length?)
+  /*
+  TODO: process userCombo input and compare to simonCombo with a for loop using userCombo.length, initiate next round with an
+  incrementing int (while < simoncombo.length?)
+  */
   btnPressed = (num) => {
-    console.log("pressed" + num);
     let matching = true;
     this.setState({
       userCombo: [...this.state.userCombo, num],
@@ -167,16 +187,15 @@ class Simon extends Component {
       if (this.state.isRunning && (this.state.userCombo.length <= this.state.simonCombo.length)){
         for(let i = 0; i < this.state.userCombo.length; i++){
           matching = matching && (this.state.userCombo[i] == this.state.simonCombo[i]);
-          console.log(this.state.userCombo[i] + " " + this.state.simonCombo[i]);
+          // console.log(this.state.userCombo[i] + " " + this.state.simonCombo[i]);
         }
       }
 
       //outputs win alert
-      console.log("Running " + this.state.isRunning);
       if(matching && (this.state.userCombo.length == this.state.simonCombo.length)){
         Alert.alert("You win!");
         this.setState({
-          btnDisabled: false,
+          btnDisabled: true,
           isRunning: false,
         })
       }
@@ -194,7 +213,7 @@ class Simon extends Component {
       if(!matching){
         Alert.alert("You lose!");
         this.setState({
-          btnDisabled: false,
+          btnDisabled: true,
           isRunning: false,
         })
       }
@@ -208,18 +227,18 @@ class Simon extends Component {
     <View style={styles.container}>
 
       {/* tester text box to display array */}
-      <Text>{this.state.simonCombo}</Text>
+      {/* <Text>{this.state.simonCombo}</Text> */}
 
       {/* top half of funny buttons */}
       <View style={styles.topHalf}>
-        <Light style={styles.topLeft} color={this.state.topLColour} num={0} callback={this.btnPressed}/>
-        <Light style={styles.topRight} color={this.state.topRColour} num={1} callback={this.btnPressed}/>
+        <Light style={styles.topLeft} color={this.state.topLColour} num={0} callback={this.btnPressed} btnDisabled={this.state.btnDisabled}/>
+        <Light style={styles.topRight} color={this.state.topRColour} num={1} callback={this.btnPressed} btnDisabled={this.state.btnDisabled}/>
       </View>
 
       {/* bottom half of funny buttons */}
       <View style={styles.bottomHalf}>
-        <Light style={styles.bottomLeft} color={this.state.bottomLColour} num={2} callback={this.btnPressed}/>
-        <Light style={styles.bottomRight} color={this.state.bottomRColour} num={3} callback={this.btnPressed}r/>  
+        <Light style={styles.bottomLeft} color={this.state.bottomLColour} num={2} callback={this.btnPressed} btnDisabled={this.state.btnDisabled}/>
+        <Light style={styles.bottomRight} color={this.state.bottomRColour} num={3} callback={this.btnPressed} btnDisabled={this.state.btnDisabled}/>  
       </View>
 
       {/* 
@@ -228,17 +247,17 @@ class Simon extends Component {
       */}
       <View style={styles.rowContainer}>
 
+        {/* while the game is running, buttons disappear!! */}
         {!this.state.isRunning &&
         <Pressable 
-        style={[styles.startButton, {backgroundColor: this.state.btnDisabled?'grey':'blue'}]}
-        disabled={this.state.btnDisabled}
+        style={[styles.startButton, {backgroundColor: 'blue'}]}
         onPress={() => [this.start(1), 
           this.setState({
             topLColour: topLeftColours[1],
             topRColour: topRightColours[1],
             bottomLColour: bottomLeftColours[1],
             bottomRColour: bottomRightColours[1],
-          }) ,
+          }),
         setTimeout(() => {
           this.setState({
             topLColour: topLeftColours[0],
@@ -252,15 +271,14 @@ class Simon extends Component {
         }
         {!this.state.isRunning &&
         <Pressable 
-        style={[styles.startButton, {backgroundColor: this.state.btnDisabled?'grey':'red'}]}
-        disabled={this.state.btnDisabled}
+        style={[styles.startButton, {backgroundColor: 'red'}]}
         onPress={() => [this.start(2), 
           this.setState({
             topLColour: topLeftColours[1],
             topRColour: topRightColours[1],
             bottomLColour: bottomLeftColours[1],
             bottomRColour: bottomRightColours[1],
-          }) ,
+          }),
         setTimeout(() => {
           this.setState({
             topLColour: topLeftColours[0],
