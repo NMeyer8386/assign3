@@ -170,6 +170,8 @@ class Simon extends Component {
           console.log(this.state.userCombo[i] + " " + this.state.simonCombo[i]);
         }
       }
+
+      //outputs win alert
       console.log("Running " + this.state.isRunning);
       if(matching && (this.state.userCombo.length == this.state.simonCombo.length)){
         Alert.alert("You win!");
@@ -179,6 +181,7 @@ class Simon extends Component {
         })
       }
 
+      //progress to the next round
       if(matching && (this.state.currentRound == this.state.userCombo.length) && this.state.isRunning){
         this.setState({
           currentRound: this.state.currentRound + 1,
@@ -187,6 +190,7 @@ class Simon extends Component {
         this.scheduler(this.state.currentRound);
       }
 
+      //outputs loss alert
       if(!matching){
         Alert.alert("You lose!");
         this.setState({
