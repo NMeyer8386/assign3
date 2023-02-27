@@ -1,4 +1,3 @@
-import { setStatusBarNetworkActivityIndicatorVisible } from 'expo-status-bar';
 import React, { Component } from 'react'
 import { Alert, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -101,7 +100,7 @@ class Simon extends Component {
 
       setTimeout(() => { // any delay at all somehow is enough time to let an array be set?????
         this.scheduler(this.state.currentRound);
-      });
+      }, 100);
 
 
   }
@@ -225,48 +224,51 @@ class Simon extends Component {
       */}
       <View style={styles.rowContainer}>
 
-        
+        {!this.state.isRunning &&
         <Pressable 
         style={[styles.startButton, {backgroundColor: this.state.btnDisabled?'grey':'blue'}]}
         disabled={this.state.btnDisabled}
-        onPress={() => this.start(1)}
-        onPressIn={() =>  
+        onPress={() => [this.start(1), 
           this.setState({
             topLColour: topLeftColours[1],
             topRColour: topRightColours[1],
             bottomLColour: bottomLeftColours[1],
             bottomRColour: bottomRightColours[1],
-          })}
-        onPressOut={() => 
+          }) ,
+        setTimeout(() => {
           this.setState({
             topLColour: topLeftColours[0],
             topRColour: topRightColours[0],
             bottomLColour: bottomLeftColours[0],
             bottomRColour: bottomRightColours[0],
-          })}>
+          })
+        }, 100),]}>
           <Text style={styles.btnText}>Start Easy</Text>
         </Pressable>
-
+        }
+        {!this.state.isRunning &&
         <Pressable 
         style={[styles.startButton, {backgroundColor: this.state.btnDisabled?'grey':'red'}]}
         disabled={this.state.btnDisabled}
-        onPressIn={() => [this.start(2), 
+        onPress={() => [this.start(2), 
           this.setState({
             topLColour: topLeftColours[1],
             topRColour: topRightColours[1],
             bottomLColour: bottomLeftColours[1],
             bottomRColour: bottomRightColours[1],
-          })]}
-        onPressOut={() => 
+          }) ,
+        setTimeout(() => {
           this.setState({
             topLColour: topLeftColours[0],
             topRColour: topRightColours[0],
             bottomLColour: bottomLeftColours[0],
             bottomRColour: bottomRightColours[0],
-          })}>
+          })
+        }, 100),]}
+          >
           <Text style={styles.btnText}>Start Hard</Text>
         </Pressable>
-
+  }
       </View>
         
     </View>
@@ -297,28 +299,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
-    borderWidth: 1,
-    borderColor: 'black',
     },
 
   rowContainer: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: 'blue',
     },
 
   landingTextBox: {
-    textAlign: 'center',
     paddingTop: 100,
     paddingBottom: 50,
     margin: 10,
     width: '60%',
-    borderWidth: 1,
-    borderColor: 'red',
   },
 
   landingText: {
-    fontSize: 20,
+    fontSize: 20,    
+    textAlign: 'center',
   },
 
   topLeft: {
@@ -362,8 +358,6 @@ const styles = StyleSheet.create({
   },
 
   startButton: {
-    backgroundColor: 'royalblue',
-    borderColor: 'gray',
     margin: 5,
     borderWidth: 1,
     borderRadius: 10,
