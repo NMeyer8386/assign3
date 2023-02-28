@@ -89,7 +89,7 @@ class Simon extends Component {
 
       this.setState({
         simonCombo: tempCombo,
-        durationMS: 250,
+        durationMS: 350,
       });
 
     // difficulty 2 is a game length of 10
@@ -105,7 +105,7 @@ class Simon extends Component {
 
       this.setState({
         simonCombo: tempCombo,
-        durationMS: 200
+        durationMS: 150
       });
     }
     // any delay at all somehow is enough time to let an array be set?????
