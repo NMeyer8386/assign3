@@ -81,7 +81,7 @@ class Simon extends Component {
 
       tempGameLength = 5;
 
-      console.log('start easy');
+      //console.log('start easy');
       for(let i = 0; i < tempGameLength; i++){
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
@@ -97,7 +97,7 @@ class Simon extends Component {
 
       tempGameLength = 10;
 
-      console.log('start hard');
+      //console.log('start hard');
       for(let i = 0; i < tempGameLength; i++){
         let simonNum = Math.floor(Math.random() * 500 % 4);
         tempCombo = [...tempCombo , simonNum];
