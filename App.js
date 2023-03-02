@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Alert, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 // CSS styling variables so I can control multiple elements at once
 const bWidth = 5;
